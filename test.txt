@@ -1,0 +1,399 @@
+By using Eqn. (18), we are allowed to express the transition
+probability on the undirected graph. We will show the power
+of this expression in the following section.
+Reviewing Fig. 9, Conditional dependencies between vari-
+ables representing different users at the same time slice can be
+expressed in the form of pairwise relationship as depicted in
+Eqn. (6). The edge across different time slices is formulated
+as the pairwise potential function Eqn. (18). The figure shows
+an example with time window being 3.
+Equipped with CRF, we not only preserve the advantage
+of HMM by directly importing the transition and emission
+probabilities, but also are able to describe more spatial or
+temporal features.
+B. Confidence and Trend
+We now try to answer the question of how to determine
+nodes with more significant prior than others, and how to
+integrate the feature within the CRF framework.
+By significant prior, we essentially wish that a node with
+a higher confidence about its position will influence a node
+with a lower confidence, but not the other way around to
+prevent the estimation error from propagating. For example,
+XIANG et al.: TACK: LEARNING TOWARDS CONTEXTUAL AND EPHEMERAL INDOOR LOCALIZATION WITH CROWDSOURCING 873
+a node that is close to a fixed beacon has a higher confidence
+about its position estimate than a node not observing anything.
+More specifically, having examined the property in Sec. IV-C,
+we can distinguish the nodes with a higher confidence by
+using criteria such as the number of nearby beacons and the
+distance to the beacons. In Tack, we implement more than
+such an intuition. Each user maintains a weight account to
+estimate its confidence level. The weight account is assigned
+a high value whenever the user gets repositioned with nearby
+fixed beacons, representing high confidence about its estimated
+position; one point is deducted from the account when the user
+takes a step implying the confidence level reduces as the user
+position drifts.
+The “confidence” feature is special in CRF in that we do
+not usually specify the inference direction over an undirected
+graph. However, in the inference algorithm to be illustrated
+later, we will show that the feature can be implemented
+without violating the problem structure. We define the feature
+as follows. Letting W i,t be the weight left in the account of
+user i at time t,
+exp( f k→i (t,D,z i,t ,z k,t )) = I(W k,t > W i,t ),
+exp( f t−1→t (t,D,z i,t ,z i,t−1 )) = I(W i,t−1 > W i,t ).
+Our simulations (with the same settings as our previous
+ones) show the effect before, indicated by HMM, and after,
+represented by CRF, the “confidence” feature is implemented.
+With some prior knowledge about each user’s estimates, the
+overall error is reduced by almost 2m, as shown in Fig. 7(a).
+Examining more closely, User 2, 3 and 8 respectively improves
+accuracy without deteriorating other users’ accuracy, if we
+compare Fig. 7(c) and 7(d).
+Apart from the “confidence” feature, we can do far more
+with CRF. For example, BLE trends measured from continuous
+BLE signals across time slots can be considered as a feature.
+A user’s position change should be consistent with the wireless
+signal trend: when the signal trend shows that a user is
+approaching a beacon, its trajectory cannot go the opposite
+way. This feature is derived from our empirical observation
+that the trend of the wireless signal strength is far more reliable
+than the strength itself, and existing work [15] echos our
+approach. For user i and fixed beacon j, the feature function
+is defined as follows:
+exp( f 3 (t, D ij,t , D ij,t−1 ,z i,t ,z i,t−1 ))
+= I(
+sign(D ij,t − D ij,t−1 )
+sign(||z i,t − z j || − ||z i,t−1 − z j ||)
+> 0).
+where z i,t represents the position of user i at time t and z j
+is the known position of the fixed beacon j. When user i
+is observed to approach a fixed beacon, the feature assigns
+a value of 1 if its position estimate reflects the approaching
+trend, and 0 otherwise. The same feature applies when user i
+goes the other way around.
+Such a trend feature takes advantage of the powerful presen-
+tation of CRF over HMM: it is able to describe overlapping
+portions of the observation sequence. An HMM with such
+overlapping feature is no longer a proper generative model,
+nor is the likelihood function correct.
+1) Backward Propagation: One may naturally wonder what
+the benefit is to take the historical trajectories and observations
+into account in CRF while our system possesses the Markov
+property and HMM seems to be a fit. In fact, historical
+By using Eqn. (18), we are allowed to express the transition
+probability on the undirected graph. We will show the power
+of this expression in the following section.
+Reviewing Fig. 9, Conditional dependencies between vari-
+ables representing different users at the same time slice can be
+expressed in the form of pairwise relationship as depicted in
+Eqn. (6). The edge across different time slices is formulated
+as the pairwise potential function Eqn. (18). The figure shows
+an example with time window being 3.
+Equipped with CRF, we not only preserve the advantage
+of HMM by directly importing the transition and emission
+probabilities, but also are able to describe more spatial or
+temporal features.
+B. Confidence and Trend
+We now try to answer the question of how to determine
+nodes with more significant prior than others, and how to
+integrate the feature within the CRF framework.
+By significant prior, we essentially wish that a node with
+a higher confidence about its position will influence a node
+with a lower confidence, but not the other way around to
+prevent the estimation error from propagating. For example,
+XIANG et al.: TACK: LEARNING TOWARDS CONTEXTUAL AND EPHEMERAL INDOOR LOCALIZATION WITH CROWDSOURCING 873
+a node that is close to a fixed beacon has a higher confidence
+about its position estimate than a node not observing anything.
+More specifically, having examined the property in Sec. IV-C,
+we can distinguish the nodes with a higher confidence by
+using criteria such as the number of nearby beacons and the
+distance to the beacons. In Tack, we implement more than
+such an intuition. Each user maintains a weight account to
+estimate its confidence level. The weight account is assigned
+a high value whenever the user gets repositioned with nearby
+fixed beacons, representing high confidence about its estimated
+position; one point is deducted from the account when the user
+takes a step implying the confidence level reduces as the user
+position drifts.
+The “confidence” feature is special in CRF in that we do
+not usually specify the inference direction over an undirected
+graph. However, in the inference algorithm to be illustrated
+later, we will show that the feature can be implemented
+without violating the problem structure. We define the feature
+as follows. Letting W i,t be the weight left in the account of
+user i at time t,
+exp( f k→i (t,D,z i,t ,z k,t )) = I(W k,t > W i,t ),
+exp( f t−1→t (t,D,z i,t ,z i,t−1 )) = I(W i,t−1 > W i,t ).
+Our simulations (with the same settings as our previous
+ones) show the effect before, indicated by HMM, and after,
+represented by CRF, the “confidence” feature is implemented.
+With some prior knowledge about each user’s estimates, the
+overall error is reduced by almost 2m, as shown in Fig. 7(a).
+Examining more closely, User 2, 3 and 8 respectively improves
+accuracy without deteriorating other users’ accuracy, if we
+compare Fig. 7(c) and 7(d).
+Apart from the “confidence” feature, we can do far more
+with CRF. For example, BLE trends measured from continuous
+BLE signals across time slots can be considered as a feature.
+A user’s position change should be consistent with the wireless
+signal trend: when the signal trend shows that a user is
+approaching a beacon, its trajectory cannot go the opposite
+way. This feature is derived from our empirical observation
+that the trend of the wireless signal strength is far more reliable
+than the strength itself, and existing work [15] echos our
+approach. For user i and fixed beacon j, the feature function
+is defined as follows:
+exp( f 3 (t, D ij,t , D ij,t−1 ,z i,t ,z i,t−1 ))
+= I(
+sign(D ij,t − D ij,t−1 )
+sign(||z i,t − z j || − ||z i,t−1 − z j ||)
+> 0).
+where z i,t represents the position of user i at time t and z j
+is the known position of the fixed beacon j. When user i
+is observed to approach a fixed beacon, the feature assigns
+a value of 1 if its position estimate reflects the approaching
+trend, and 0 otherwise. The same feature applies when user i
+goes the other way around.
+Such a trend feature takes advantage of the powerful presen-
+tation of CRF over HMM: it is able to describe overlapping
+portions of the observation sequence. An HMM with such
+overlapping feature is no longer a proper generative model,
+nor is the likelihood function correct.
+1) Backward Propagation: One may naturally wonder what
+the benefit is to take the historical trajectories and observations
+into account in CRF while our system possesses the Markov
+property and HMM seems to be a fit. In fact, historical
+Our experiments are conducted in a hallway with no obsta-
+cles in sight and no other BLE devices turned on. In the two
+groups of experiments, we fix the position of a beacon or
+an iOS device, have the testing phone (iPhone 6S) placed at
+certain distances from it, and measure accuracy and rssi.
+We collect samples for multiple runs to compute the mean and
+standard deviation of the distance errors.
+When measuring distances from a beacon, as Fig. 2(a)
+shows, the distance error obtained from the accuracy value
+is smaller with a modest standard deviation than that translated
+from rssi. On the contrary, when measuring distances from a
+phone, Fig. 2(b) shows that the translated distance using rssi
+enjoys a smaller error than using the accuracy value. This is
+because the accuracy value provided by the iOS framework
+is tuned for beacons rather than a smartphone; a smartphone
+normally has a higher transmission power than a beacon, and
+as a result, the distance it reports is usually less than the ground
+truth.
+Despite the difference between the values reported by
+accuracy and rssi, we are also curious about the distance
+errors when there are obstacles in the environment. We further
+measured the distances reported by accuracy in the same
+hallway with the beacon (phone) blocked by obstacles. The
+result is depicted in Fig. 2(c). As we can tell, compared to the
+open space, the reported values are mostly above the ground
+truth, but are still close to them, particularly when the actual
+distance is less than 10 meters in between.
+But regardless of the situation, the overall bad news is
+that we are not able to assume that distance estimates are
+accurate unless the actual distance is small. Moreover, in
+the presence of a beacon, the accuracy value is generally
+a better indicator of the distance estimate. This is because
+accuracy is tuned considering the surrounding environment,
+and is usually used to distinguish different objects in the same
+region of a beacon, according to Apple’s document. Although
+quite noisy, the distance estimate is sufficiently accurate for
+our localization algorithm as we will discuss later.
+C. Challenge 2: Noisy Sensor Readings
+Besides noisy distance estimates, sensors used in DR
+pose another significant challenge. We have conducted new
+experiments to quantify the errors in the heading direction
+from magnetometer sensors on smartphones. Fig. 2d shows
+the error when turning the smartphone’s heading from the
+true north. The true north is obtained by the compass and
+is recorded beforehand. As we can observe, the direction
+error reaches 20 degrees when the direction change is 120
+to 180 degrees. Overall, the heading direction measured using
+a magnetometer has an error of around 5 degrees on average
+when the user holds it in her hand, and the error is slightly
+higher (around 10 degrees) when the phone is placed flat on
+a desk.
+The step counter may also be another source of error.
+To quantitatively measure this source of error, we have con-
+ducted an experiment by asking 5 users to hold their phones
+and walk at different paces repeatedly. As shown in Fig. 3(a),
+a steady pace introduces the least amount of error, mainly
+because the filter parameter in the step counter is tuned
+according to a normal speed. On average, the error is only
+1.5 steps for every 50 steps. In the worst case, the error is
+fewer than 3.5 steps. Such errors are not significant since
+indoor users usually take fewer than 50 steps before they are
+repositioned by contacts with beacons.
+Our experiments so far have clearly shown that, with
+both noisy distance estimates and noisy sensor readings, new
+algorithms need to be designed to compute position estimates
+as accurately as possible, taking such noise into account.
+IV. A L OCAL V IEW : A P ROBABILISTIC A PPROACH
+To introduce the localization inference system, we first take
+a single user’s view. Each position is represented by a multi-
+dimensional variable. Some variables have more significant
+prior than others; for example, the fixed beacons with known
+positions can be represented as a Dirac delta distribution. Since
+the initial positions of the mobile users are unknown, their
+positions can be considered as uniform distributions over the
+floor plan. We use particles to represent each geo-distribution
+and propose augmented particle filters like the model in [18].
+A. Augmented Particle Filters
+In control theory, particle filters are used to improve the
+tracking accuracy of time-varying variables of interest, by
+constructing a sample-based representation of the targeted
+variables’ probability density function (pdf). In particular, its
+performance exceeds other filtering methods, such as Kalman
+filters, in cases where variables are non-linear and non-
+Gaussian. In our localization system, as most of the previous
+Donald Trump described the European Union one of his greatest “foes” in another extraordinary diplomatic intervention on Sunday, just hours before sitting down to a high-stakes summit with Russian president Vladimir Putin.
+
+
+Trump adviser Roger Stone 'probably' American cited in Russia indictments
+ Read more
+Asked in a TV interview to name his “biggest foe globally right now”, the US president started by naming the European Union, calling the body “very difficult” before ticking off other traditional rivals like Russia and China.
+
+Hours earlier, British prime minister Theresa May revealed that Trump suggested she “sue the EU” rather than go into negotiations over Brexit.
+
+“Well I think we have a lot of foes,” Trump told CBS News at his Turnberry golf resort in Scotland. “I think the European Union is a foe, what they do to us in trade. Now you wouldn’t think of the European Union but they’re a foe.”
+
+Apparently taken aback, anchor Jeff Glor replied: “A lot of people might be surprised to hear you list the EU as a foe before China and Russia.”
+
+But Trump insisted: “EU is very difficult. I respect the leaders of those countries. But – in a trade sense, they’ve really taken advantage of us.”
+
+Trump’s controversial tour through Europe has turned postwar western relations inside out, the president sparring with Nato leaders in Brussels and blasting May’s Brexit strategy in the Sun newspaper. His remarks have reflected one of this president’s core beliefs: that America is exploited by its allies.
+
+Donald Tusk, president of the European council, tweeted: “America and the EU are best friends. Whoever says we are foes is spreading fake news.”
+
+Trump departed Scotland for Helsinki, where allies are concerned about how much common ground he will find with Putin when they meet at the Finnish presidential palace.
+
+ It’s leaving the Washington foreign policy community utterly terrified. Trump has been undermining traditional alliances
+Max Bergmann, Center for American Progress
+From Air Force One, as media scrutiny intensified, the president unleashed a bizarre volley of tweets: “Unfortunately, no matter how well I do at the Summit, if I was given the great city of Moscow as retribution for all of the sins and evils committed by Russia … over the years, I would return to criticism that it wasn’t good enough – that I should have gotten Saint Petersburg in addition!”
+Trump added: “Much of our news media is indeed the enemy of the people and all the Dem[ocrats … know how to do is resist and obstruct! This is why there is such hatred and dissension in our country – but at some point, it will heal!”
+The Kremlin has billed the summit as “the event of the summer” but Trump and advisers have played down expectations for a meeting that will include a session attended only by the two leaders and their interpreters. Putin and Trump are expected to discuss issues from nuclear arms treaties to the conflict in Syria, but with a very loosely-defined agenda.
+o the young one. But it was impossible long to resist the fascination of this new extension of power. She came and sat down in the grass and watched. She was friendly again, and he, too, having the stick, was gracious. He was a young, strong, well-looking member of the tree-folk. Lying about were some small stones, miniature boulders. He struck the end of the stick beneath one of these, put his weight upon the other end, and lifted the stone out of its bed. The lever was here. Both of them jabbered with excitement. There were other stones. She wanted to disturb one, too, and she came across and put her hand upon the stick. “Let me!” meant the sound which she uttered.{12} But he jabbered back, and shook her off, and went on turning over stones. Very angry, she returned to the charge, and, watching her chance, suddenly jerked the stick from him. He sprang to his feet and seized it again. She screamed at him and held it stubbornly—a good, thick piece of wood it was! The other kind, now in a violent passion, tugged and wrenched until he got it from her. Then, with suddenness, he found yet another use for a piece of wood. He knocked her down with it, and when, with a cry of fury, she rose to her feet, he repeated the action.
+n the matter of weapons the people of the long houses yet depended upon the spear, but were upon the threshold of the bow and arrow. In the heat of summer they wore{32} brief garments of woven grass; in the colder weather they garbed themselves in skins sewed with a bone needle and a fibre thread. Year by year, life by life, they were moulding a flexible, strong, not unmusical language. They could count beyond ten. Simple calculations were coming into the scope of most. Here and there finer brains undertook calculations not quite so simple. They used a ceremonial burial of the dead, and they placed beside the body weapons and other objects which might be useful in some vague other world. They observed the moon and the larger stars, and to every single thing under heaven they attributed a will to save or to damn. They had a body of customs, not yet stiffened into law. Women, the makers and possessors of children, the original devisers of houses and clothes and such things, the earliest lawgivers and gatherers of people into societies, were yet, through the greater range of matters, the authoritative sex. They were the mothers, the instinctively turned to even after childhood, the dimly deified. But men were powerful encroachers, and they encroached.
+
+To the two alike had once fallen the fierce, the incessant warfare against their old kindred the beasts. Now, the women abetting, the men had almost taken over that department of living. Men were the manufacturers of spear and spearhead, the experimenters with stone axe and stone knife. They were the steady feelers toward bow and arrow, the chief hunters now of dangerous beasts, strengthening in muscle, gaining in height, careless of inflicted pain, watchers of flowing blood, quarrellers with chance—met other hunting bands from other long houses, adventurous, bold, standing by wide rivers, meditating a raft, a boat, or from hill-tops watching the climbing stars,{33} roaming afar from the houses and returning. Wilder than his mate was the male and more violent, as became one who had nothing to do with children. Nor he, nor she, believed that he had anything to do with children—nor with the making of them, nor with the owning them after they were made.
+
+A cluster of women came down to the bank of one of the ribbon-like water-courses winding through the fen. Here was a bed of clay. The women carried a number of uncertainly shaped vessels of plaited rush and osier. These they laid upon the earth, and sitting down by the stream, fell to dashing water over the clay, and, when the latter was sufficiently softened, to gathering it up and kneading it with the hands. When the mass was very smooth and plastic, each woman took one of the osier shapes, set it between her knees, and began to daub it within and without with clay. They wet their hands and worked with palm and fingers and thumb, and also with a spatula-like piece of wood, bringing the clay into one surface, smoothing and finishing it off. When bowl and jar were dried in the sun, then water might be carried without grave loss and meat might be cooked without the osiers burning in the fire. An idea came to one of the women. She took a mound of wet clay and with her hands and the spatula she worked until she had a bowl of the clay itself without any osier inner walls. “Ha!” she cried. “Look!” Setting the bowl aside in the sun, she took more clay and made a jar-like shape. The other women suspended work to watch her. They leaned forward, interest in their eyes. An old woman, sitting by, watching not working,—old Aneka the Wise Woman,—made a sound of approval. “Good!” said Aneka. “It is good to think and to put one thing and{34} another thing together! Now you can make pots without braiding reeds.”
+
+Back on the sun-hardened strip before the houses a fire was burning. At a fair distance from this rose a young tree and to the tree was tied a creature with his wolf descent written plain. A woman came from the nearest house, in her hands a piece of raw meat. When the wild dog saw the meat he made a bound and strained fiercely at the thongs which held him. The woman laid the meat upon the ground, not far from the fire. Then she took a billet of wood and, passing before the tied creature, showed it to him not once but many times. This done, she placed the piece of wood upon the ground as far from him in the one direction as was the piece of meat in the other. Next in order, she took a long, stout stick, seasoned and sharpened, and striking one end into the embers, watched it until it was aflame. All this time the half-dog, half-wolf, was making a noise. Woman, dog, meat, stick, and fire had for observers a number of naked children. Now she turned upon these and ordered them within the house, and when they protested and went reluctantly, she threatened them with voice and stick. The ground clear, the woman, the burning stick in her hand, went and untied the creature to be tamed. He sprang at her, but she lunged as fiercely with the brand, and he gave back and cowered. She spoke in a voice of command, pointed out the billet of wood, and spoke again. The creature gathered himself together and made a leap—toward the piece of meat. She was there before him, squarely between him and it, the burning wood sending forth sparks. Again he gave back and hung uncertain, growling deeply. She gestured for the twentieth time toward the bit of wood. “Bring{35} me that! Then you shall eat.” He would have liked to tear her into pieces, but after many minutes of this work,—rushes toward the meat, beatings-back with stick and voice and eye,—he brought her the billet of wood. “Good! Now, go eat!”
+
+East of the long houses spread a space of earth firmer than the neighbouring fen, more open than the neighbouring forest. Three women were here. They had wooden staves, and at the end of each was bound at right angles a large, rudely sharpened flint. With these the women were loosening the fat, black earth. Beside them lay a heap of roots and plants taken from the forest.
+
+Beneath a tree sat a lean man watching. In weather such as this, and with no ceremonial toward, the men of the long houses went all but nude. But the lean man dressed every day, and that with punctiliousness and ornamentation. He had this morning, beside other apparel, a string of small, dried gourds passing over one shoulder and under the other. They rattled when he moved.
+
+“Ha!” chanted the hoeing women—
+“We are going to see
+That which we shall see!
+We are going to put
+Yuba in the earth!
+If she rots there, bad!
+If she grows there, good!
+Yuba! grow big!
+Yuba! make children!
+Then shall we eat
+Without going to seek.
+Then shall we have
+Yuba to our hand!
+Yuba and her children,{36}
+Sweet to the tooth!
+Then none will hunger,
+Though the fish go away!
+Then none will hunger,
+Though the men kill no meat!
+Then those who laugh,
+Saying, ‘What do you do,
+Scratching there in the earth?’
+They will come to us begging.
+They will cry, ‘Give us Yuba!’”
+
+The man with the gourds chose the attitude of contempt before an infant industry. He spoke in a guttural voice. “You are like fish and have no sense! I go into the forest and when I am hungry, I look around me, and I sing, ‘Yuba! Yuba!’ ‘Here I am!’ says Yuba plant. ‘Dig me up!’—But you say, ‘Let us tie Yuba to the houses!’” He shook the gourds. “You are more foolish than the fish. They do not go about to make the river angry. But you go about to make Yuba angry!”
+
+The women leaned upon their hoes and regarded with apprehension the heap of Yuba roots. The sun lay golden all around. “She does not look angry! We think she likes to come near the houses.”
+
+But the man with the gourds remained indignant. “Ha! No, she does not! All kinds of things are coming to be angry with you women!” He shook the rattling string. “What will you give me if I go to the forest and sing and dance for you before Yuba?”
+
+“We are going to dance before her here,” said the farmers. “We are going to make a great Yuba dance!—Why don’t you go hunting? All the men are hunting.”
+
+The sitter under the tree shook from a gourd a number of long and sharp thorns. “Yes, they are hunting! They{37} are hunting Big Trouble. But I, too, hunt Big Trouble, and I hunt better than they.” He spoke with growing unction. “Yesterday I went into the forest. I did not go with others—I went by myself. I found Big Trouble’s footprints. I found where he had broken the canes and laid down. I stuck long thorns in his footprints.” He talked with gestures no less than with words. “I put thorns in the earth where he rolled. So to-day Big Trouble is going like this—” He got up and limped painfully about, then sat down and with his long nail drew a mark across the ground before him. “I did so before his footprints. Now, wherever he goes, the pit is before him! Now they will hunt Big Trouble easily. Now he will go straight to the pit they have made and fall in it.” He fell himself, doubled-up, upon the ground to show the manner of it, then retook his first posture and shook the gourds. “They think they are hunting Big Trouble. But Haki and One Other hunted him first! Now I sit still and wait for the men to come home. They will give me so much meat.” He measured with his arms. “I will burn a part of it for One Other.”
+
+The awe he meant to evoke was faintly apparent. The farmers laughed uneasily, with a catch of the breath. “Don’t put thorns in our footprints!” said one; and another, “Rub out the pit you’ve made before us there!” He smeared it over with the palm of his hand, then shook the gourds and looked sidelong and slily at the working women. “Will you give me Yuba if she stays here and grows for you?”
+
+“Oh, we’ll give you plenty!” answered the farmers. They laughed as they said it, but they laughed uneasily. However, they went on singing, using the first hoes.{38}
+“Then none will hunger,
+Though the fish go away!
+Then none will hunger,
+Though the men kill no meat!
+Then those who laugh,
+Saying, ‘What do you do,
+Scratching there in the earth?’
+They will creep to us softly,
+They will cry, ‘Give us Yuba!’”
+
+Far off, in the deep woods, the men of the long houses were hunting Big Trouble, hunting him far and wide. Big Trouble had chosen to make such a path to the river as brought him into close quarters with the houses. Moreover, on more occasions than one, he had strayed aside from the path; he had come brushing and trampling and ruining against the place itself, all in the dead of night, waking and terrifying! So now Big Trouble was to be killed. To that end, for many days, they had been digging a pit in the wood, deepening and widening the mouth of a gully near to old haunts of Big Trouble. When it was deep enough and sharply shelving enough, they set at the bottom pointed stakes and then they covered all with a net of vines, artfully made to look like the very floor of the forest; strong enough, too, not to give beneath the weight of any slight forest creature. But let Big Trouble try it—! For days, also, they had been talking and training, exercising their muscles, trying their spears and clubs, asking help of the Great Turtle who was mysteriously their especial friend—the Great Turtle at the mouth of the great river, who came from the water and laid her eggs upon the sand. Now they were all in the deep wood, driving Big Trouble, disturbing him with flung club and spear, getting him to go toward the pit. Big Trouble was so big, and{39} covered with such a fell of shaggy, red-brown hair that a flung club or spear troubled him little, and on the whole he was good-natured, and since he did not eat flesh, would not hurt them in turn—not unless they mightily angered him. Then, indeed, he would hunt with a vengeance, filling the air with trumpetings, tearing down the forest, shaking the earth, seizing the unlucky with his trunk and trampling them into an awful pulp! To hunt Big Trouble was to hunt in peril and excitement and with a fearful joy—a hunting that needed beforehand rites and ceremonies, and when it was accomplished, rites and ceremonies.
+
+Women as well as men hunted Big Trouble, though not anything like so many women as men. But when a woman wished to hunt, she hunted; hunted for food now as long since, hunted for joy in activity, danger, and excitement. It was a dwindling custom, but they hunted yet. Half a dozen now stalked Big Trouble with the men and threw their spears against him.
+
+By the time the sun was high, Big Trouble had rolled his bulk very near the hidden pit. He was growing angry. The hunters had now to act with extreme wariness. Just before he reached the pit, he turned. He would go no farther. He stood trumpeting and all the hunters got behind thick trees and crouched trembling. Big Trouble glared with his small, red eyes. Shaggy, with red-brown hair, with hugely long, curving tusks, vast and dusky, the mammoth stood swaying from side to side, growing angrier and angrier, searching with those now vicious, deep-sunk, red eyes. The hunters shrank to be smaller and smaller behind the trees. Their hearts grew small within them. Big Trouble did not mean to go on, had stopped definitely short of the snare! He would stay there for{40} hours, watching, and if any one moved he would make his fearful, trampling rush.... Time passed, much time. The sun that had been up in the plains of the sky began to travel down the sky, down and down the sky. Big Trouble kept as he was; only now and then he trumpeted.
+
+A young man and woman left the screen of a wide-girthed tree. They darted into the open. Big Trouble saw them out of the red corner of his eye. He swung his bulk about and, trumpeting, charged. Immediately the two were behind a greater tree than the first. Big Trouble passed, trumpeting, and the wind of him shook the leaves. Baffled, he stopped and stood swaying, angrier than before, angrier every moment. The two left the second tree and fled before him. He followed, darkness and weight arush through the forest. The man and woman gained the third tree. Big Trouble passed, then he turned. The two left their tree and raced before him, racing straight now to the pit. Big Trouble came after them, and he shook the earth and air. The two took life in their hands, made themselves light, bounded upon and across the roof of vine and leaf. It gave a little beneath their feet, but only a little. As near skimming as might be, they won to the farther side, and with a long cry of triumph rushed to shelter. On, after them, thundered and trumpeted Big Trouble. His forefeet came down upon the roof of the pit; he felt it break beneath him, but could not stop himself. Over and down he plunged, down with a frightful noise. The stakes caught him, the steep sides wedged him in. Big Trouble was not going any more to trouble the long houses.
+
+The two who had toled Big Trouble into the pit marched in triumph back to the houses, at the head of the hunters.{41} The two were big and strong, young, and according to the notions of their people, well-favoured. Back they and all the hunters came, shouting and chanting, through the leafy world with the red sun sinking behind them, and borne along, slung over a pole, the seven-feet-long curved, ivory tusks of Big Trouble. Out to meet them came the too old to hunt and the too young, came the man with the thorns and the gourds, came the women, all who had not hunted. Singing and shouting, the two tides met in the red sunset, beneath the black trees.
+“Big Trouble is dead!
+He will plague us no more!”
+
+The sun was going down—the hunters were tired, tired! They ate what was given them, fell upon the earth and went to sleep. But the next day the long houses made a feast of commemoration—Big Trouble being gone forever.
+
+Gata, who had hunted Big Trouble and raced over the roof of his pit, left the feasting ring about the council tree. The sun hung low, the river flowed, a crooked brightness. Most of the folk of the long houses were hoarse with singing and shouting, and drowsy with food and drunk with dancing and with a brew that they made out of forest fruits. Many were asleep, others noisy with no reason, others grunting and dull-eyed. Gata had danced, but she had not eaten and drunken to disorder and heaviness. Now she rose and left the feast, for she was tired of it. She expected one to follow. She had been watching Amru where he sat under the tree. Neither had he eaten and drunken and danced to stupidity.
+
+Here and there in the fen were higher places, islands as{42} it were, covered with a short grass. She took a path that led to such a spot. On either hand the reeds stood up, and they waved and sighed in the evening wind. The long houses disappeared from sight. Looking back she saw Amru upon the path.
+
+Here, where it lifted from the fen, the earth rested warm. The sun moved red through a zone of mist. The tall reeds made a wall for the grassy island. Gata and Amru sat facing each other on the round earth, round like a shield, above the fen. A last ray from the sun brightened Gata’s hair that was darkly red. With the flat fen about them, and behind the low forest, they looked larger than life. They leaned toward each other, they pressed their hands together, their bodies together. Lifted by the lifting earth, they looked one piece.
+
+The sun touched the rim of earth and coloured the river through the fen. Gata and Amru lay embraced.
+
+Almost as soon as the sun sank, the moon rose. It came up round and golden—only the people of the long houses did not know gold. Still the folk slept, tumbled like acorns beneath the council tree. A few old people did not sleep, but sat nodding, nodding, and women who had young children did not sleep. But all the strong men slept, some lying like fallen trees, and others snoring and grunting. The man with the gourds, who had watched the farmers, did not sleep. He had a mind and a conscience that often kept him awake. Now, as the moon came up, he wandered forth from the littered strip before the houses. “One Other” often commanded his presence by night. Now he walked by the fen and regarded the moon. The night was hot, but the lean man felt a wildness and exaltation that kept him above the heat. He wore skirt and{43} baldric and headdress of grass and mussel shells and coloured feathers, and he moved at tension through the hot, moist air.
+
+Going so, he overtook another who had left those who gorged upon mammoth meat—Aneka the Wise Woman. He shook his coloured headdress; jealousy stung him. “Ha, Aneka! It is Haki who walks here by night and talks with One Other!—Why do you not stay and watch children so that they do not eat that-which-poisons?”
+
+Aneka, wrinkled and brown, gazed at him and then over the fen to the golden moon. “There is much spite in you, Haki! I am older than you and I walked here first.”
+
+They turned into the path through the fen. Haki waved his arms. “You and all the people cry to the Great Turtle. I cry to One Other!”
+
+“One Other?” asked Aneka. “Where is she?”
+
+Haki looked at her aslant. His voice sank. “Hush! He has gone into the ground for the night. He lives in the sun.”
+
+The long houses used feminine pronouns when they spoke of the supernatural. Aneka stared at Haki. “He?” she said. “How bold are you, O Haki!”
+
+But Haki, having plucked a feather from the future, came back to the present and its so solid seeming realities. A thrill of fear and awe of the Great Turtle ran through him, with thought of what vengeance she might take. “I call to the Great Turtle too!” he said hastily. “One Other and the Great Turtle are friends.”
+
+“Can One Other make children?” asked Aneka.
+
+It was the wall that towered before the male’s assertion of equality. Nothing with the masculine pronoun could do that! The people of the long houses knew all about{44} mating. They had words in plenty for that. But they had no word like “father.” Haki uttered a guttural sound, half despair, half anger. He walked in silence while the moon climbed the sky. Then revolt again raised its head. “One Other will find out how!”
+
+Aneka knew plants that poisoned and plants that healed. Stooping, she gathered a plant that used one way was poisonous and used another was healthful. Aneka was old and knew much. Throughout life she had had a watchful eye and comparing mind. But it was not her way to tell all that she knew.... She gathered stalk and leaf and moved with Haki in silence.
+
+They were now somewhat deep in the fen. Presently, the path curving like a tusk of Big Trouble, they came to the shield-like, lifted place. The moon bathed it white. Clothed in that silver Gata and Amru lay asleep.
+
+The old Wise Woman and the early Medicine Man stood and gazed. The moon looked very large, the fen very wide. The two interlaced figures seemed large with the rest of the world. Aneka and Haki watched awhile, then turned aside without waking the sleepers. Their path, bending, led them again to the edge of the fen, to the quarter whence they had come. Haki walked perhaps cogitating the pair, perhaps cogitating One Other who had gone into the ground for the night, One Other and his possibly developing powers. But Aneka looked over her shoulder at the full, bright moon.
+
+That moon waned and other moons waxed and waned, and Gata and Amru remained companions and most fond of each other. That was not so usual among the people of the long houses. Only at great intervals arose among them some example of enduring attachment between woman{45} and man. So novel was it that when it markedly happened the group paid attention. It was a social phenomenon of the first importance, and though they gave it no such sounding name, and indeed no name at all, they noted it.
+
+For many days after the slaying of Big Trouble, Gata and Amru hunted in company. The forest received them in the morning; they returned at eve, bearing game or wearing trophies to show that certain four-footed enemies of the long houses were enemies no more. The people praised them. Children were told, “Grow up to be like Gata and Amru!”
+
+Moons brightened, moons darkened. At last it was seen that Gata was making a child. After that, as the custom had grown to be, she hunted no more.... Amru was jealous of the child that Gata was making. He felt a fierceness toward it as though it were a man fighting with him for Gata’s favour. From that he passed to anger with Gata herself. Gata could not like Amru as much as Amru liked Gata. She would be showing superiorities! Savage pride was hurt. Amru and Gata had a loud quarrel, after which they parted as companions.
+
+Gata went to the forest and walked there alone. Amru and other men were making a boat. Boats were a mystery belonging to men. Men had had that notion, had experimented with it, and then had declined to share knowledge and honours. Men went ostentatiously apart when they would make a boat. They kept a thicket screen between them and the long houses, and they stationed watchers. The women heard the thud of the falling tree, and they smelled the smoke when began the hollowing process—but for the rest it was a mystery. When the boat was made, it was held to belong to men.{46}
+
+Amru was strong and skilful and many of the folk had a liking for him, and he tended to become a leader. Now with other young men he was making a boat.... Gata walked alone by the edge of the forest. She could see, between her and the river, the curling smoke where the men worked. She carried a spear, and felt no especial terror of the forest. The forest and its creatures composed an old, familiar pattern in her brain. Within her was aglow another ancient pattern....
+
+She sat down between the outcropping roots of a tree. A play of emotions filled her, kept her in a manner of iridescent dream. Around spread the forest floor of perished leaves, multitudinous, layer after layer of perished leaves. Overhead were the green leaves, quivering and thrilling. The savage woman sat and felt, and as best she could thought.... Imagination waked in her. Somewhere or other, she distinctly saw herself, moving beneath the trees, holding against her shoulder the child that would be born. She knew with certainty that she would be fond of it.... After this, she thought of Amru. She sat quite still, her spear beside her, her dark red hair shadowing her face. She felt at once old and young—as though she had lived long, and as though sky and earth were new....
+
+Near the tree grew flowering bushes, and in the branchy mass of one was set a bird’s nest, filled with callow young. Gata fell to watching the nest and the bird that perched beside it. Hunter’s experience, savage experience, gave at wish an immobility of body, a mimicry of rooted life. Gata seemed as unmoving as the trunk of the tree. The nestlings opened their mouths and stirred their unfeathered bodies. The bird spread its wings and went farther into the flowery thicket. When it returned it had food in{47} its beak. It fed its young. In a moment came, too, the male bird—it also bore food and fed the young. The mother bird perched once more beside the nest. The he-bird perched upon a second branch and sang. “Sweet! So sweet!” was its song, and the she-bird and the young birds seemed, liking it, to listen. Gata listened likewise.
+
